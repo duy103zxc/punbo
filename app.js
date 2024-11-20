@@ -1,61 +1,48 @@
-const $sentenceList = document.querySelector('.sentence-list')
-let input = document.getElementById('myInput');
+const $sentenceList = document.querySelector('.sentence-list');
+const input = document.getElementById('myInput');
+const searchButton = document.getElementById('search-keyword');
 
 let listOfSentences = [];
+let content = "";
 
-document.getElementById('search-keyword').onclick = function () {
-    let fr = new FileReader();
-    fr.onload = function(e) {
-        let text = e.target.result.split("\n").forEach(line => {
-            console.log("Searching in: " + line);
-            if (line.includes(input)) {
-                console.log(line);
-                listOfSentences.push(line);
-            }
-        });;
-
-    };
-    let text = fr.readAsText("dataset.txt");
-    
-};
-
-let out = "";
-
-function getMultipleRandom(arr, num) {
-    const shuffled = [...arr].sort(() => 0.5 - Math.random());
-  
-    return shuffled.slice(0, num);
+/**
+ * Load text file contents
+ */
+async function loadFile() {
+  try {
+    const response = await fetch("dataset.txt");
+    if (!response.ok) {
+      throw new Error("Server Error");
+    }
+    content = await response.text();
+    // console.log(content);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-const arr = ['b', 'c', 'a', 'd'];
-console.log(getMultipleRandom(arr, 2)); // 👉️ ['a', 'c'];
-console.log(getMultipleRandom(arr, 3)); // 👉️ ['c', 'b', 'c']
+loadFile();
 
-  
-listOfSentences.map((sentence) => {
-    out += `<li><a href="#">${sentence}</li>` + `\n`;
-})
+/**
+ * Search sentences containing the input keyword
+ */
+function searchSentences() {
+  const keyword = input.value.trim().toLowerCase();
+  listOfSentences = [];
 
-$sentenceList.innerHTML = out; 
-console.log(out);
+  content.split("\n").some(line => {
+    if (line.toLowerCase().includes(keyword)) {
+      listOfSentences.push(line);
+      if (listOfSentences.length >= 20) {
+        return true; // stop searching after 20 matches
+      }
+    }
+    return false;
+  });
 
+  console.log("Search has finished");
 
-// function myFunction() {
-//     // Declare variables
-//     var input, filter, ul, li, a, i, txtValue;
-//     input = document.getElementById('myInput');
-//     filter = input.value.toUpperCase();
-//     ul = document.getElementById("myUL");
-//     li = ul.getElementsByTagName('li');
-  
-//     // Loop through all list items, and hide those who don't match the search query
-//     for (i = 0; i < li.length; i++) {
-//       a = li[i].getElementsByTagName("a")[0];
-//       txtValue = a.textContent || a.innerText;
-//       if (txtValue.toUpperCase().indexOf(filter) > -1) {
-//         li[i].style.display = "";
-//       } else {
-//         li[i].style.display = "none";
-//       }
-//     }
-//   }
+  // update sentence list
+  const out = listOfSentences.map(sentence => `<li><a href="#">${sentence}</a></li>`).join('');
+  $sentenceList.innerHTML = `${out}`;
+};
