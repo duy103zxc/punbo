@@ -1,56 +1,61 @@
-// Select DOM elements
-const $app = document.querySelector('.App')
-const $search = document.querySelector('.Search')
-const $searchInput = document.querySelector('.Search input')
-const $songList = document.querySelector('.SongList')
+const $sentenceList = document.querySelector('.sentence-list')
+let input = document.getElementById('myInput');
 
-let content = null;
+let listOfSentences = [];
 
-function loadFile() {
-  let xmlhttp = new XMLHttpRequest();
-  xmlhttp.open("GET", "dataset", false);
-  xmlhttp.send();
-  if (xmlhttp.status==200) {
-    content = xmlhttp.responseText;
-  }
+document.getElementById('search-keyword').onclick = function () {
+    let fr = new FileReader();
+    fr.onload = function(e) {
+        let text = e.target.result.split("\n").forEach(line => {
+            console.log("Searching in: " + line);
+            if (line.includes(input)) {
+                console.log(line);
+                listOfSentences.push(line);
+            }
+        });;
+
+    };
+    let text = fr.readAsText("dataset.txt");
+    
+};
+
+let out = "";
+
+function getMultipleRandom(arr, num) {
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+  
+    return shuffled.slice(0, num);
 }
 
-loadFile();
+const arr = ['b', 'c', 'a', 'd'];
+console.log(getMultipleRandom(arr, 2)); // 👉️ ['a', 'c'];
+console.log(getMultipleRandom(arr, 3)); // 👉️ ['c', 'b', 'c']
 
-let listOfSentences = {}
-
-
-const getSearchResults = (query) => {
-  for (line in content) {
-    if (line.includes(query)) {
-      listOfSentences.add(line);
-    }
-    if (listOfSentences.length > 50) {
-      break;
-    } 
-  }
-}
-
-
-const renderSearchResults = (results) => {
-  $songList.innerHTML = results.map((sentence) => {
-    return `<li class="Song">
-      <h3>${sentence}</h3>
-    </li>`
-  }).join('\n')
-
-  if (results.length > 0) {
-    $app.classList.add('hasResults')
-  } else {
-    $app.classList.remove('hasResults')
-  }
-}
-
-$searchInput.addEventListener('input', (event) => {
-  const query = $searchInput.value
-  const results = (query.length > 1) ? getSearchResults(query) : []
-  renderSearchResults(results)
+  
+listOfSentences.map((sentence) => {
+    out += `<li><a href="#">${sentence}</li>` + `\n`;
 })
 
+$sentenceList.innerHTML = out; 
+console.log(out);
 
 
+// function myFunction() {
+//     // Declare variables
+//     var input, filter, ul, li, a, i, txtValue;
+//     input = document.getElementById('myInput');
+//     filter = input.value.toUpperCase();
+//     ul = document.getElementById("myUL");
+//     li = ul.getElementsByTagName('li');
+  
+//     // Loop through all list items, and hide those who don't match the search query
+//     for (i = 0; i < li.length; i++) {
+//       a = li[i].getElementsByTagName("a")[0];
+//       txtValue = a.textContent || a.innerText;
+//       if (txtValue.toUpperCase().indexOf(filter) > -1) {
+//         li[i].style.display = "";
+//       } else {
+//         li[i].style.display = "none";
+//       }
+//     }
+//   }
