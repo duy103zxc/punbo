@@ -22,7 +22,7 @@ pub fn get_file_content(file_name: &str, output: &str) -> Result<(), Error> {
         .lines()
         .map_while(Result::ok)
         .filter(|line| !line.is_empty())
-        .map(|line| format!("{}\n", line.trim()))
+        .map(|line| format!("{}\n", line.trim().replace(". ", ".\n")))
         .collect();
 
     writeln!(&file_writer, "{}", lines)?;

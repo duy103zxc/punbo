@@ -26,15 +26,16 @@ loadFile();
 
 
 function searchSentences() {
-  const keyword = input.value.trim().toLowerCase();
   listOfSentences = [];
   landing.style.display = "none";
+  const keyword = input.value.trim().toLowerCase();
+
   
   content.split("\n").some(line => {
     if (line.toLowerCase().includes(keyword)) {
       listOfSentences.push(line);
-      if (listOfSentences.length >= 20) {
-        return true; // stop searching after 20 matches
+      if (listOfSentences.length >= 50) {
+        return true; // stop searching after 50 matches
       }
     }
     return false;
@@ -43,11 +44,22 @@ function searchSentences() {
   console.log("Search has finished");
 
   // update sentence list
-  const out = listOfSentences.map(sentence => `<li>${sentence}</li>`).join('');
+  const out = listOfSentences.map(sentence => {
+    const keyword = input.value.trim().toLowerCase();
+    const regex = new RegExp(keyword, 'gi');
+    console.log(keyword);
+    const newSentence = sentence.replace(regex, `<span class="hl">${keyword}</span>`);
+    return `<li>${newSentence}</li>`;
+  }).join('');
   $sentenceList.innerHTML = `${out}`;
 };
 
 
 searchButton.addEventListener('click', () => {
-  searchSentences()
+  searchSentences();
 })
+window.addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    searchSentences();
+  }
+});
